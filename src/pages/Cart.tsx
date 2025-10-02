@@ -40,7 +40,7 @@ const Cart = () => {
                 className="flex gap-4 p-4 border rounded-lg"
               >
                 <img
-                  src={item.image}
+                  src={item.image_url}
                   alt={item.name}
                   className="w-24 h-24 object-cover rounded"
                 />

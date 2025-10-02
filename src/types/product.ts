@@ -3,9 +3,11 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  image: string;
+  image_url: string;
   category: string;
-  inStock: boolean;
+  in_stock: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface CartItem extends Product {

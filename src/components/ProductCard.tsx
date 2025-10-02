@@ -23,7 +23,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       <div className="space-y-4">
         <div className="aspect-square overflow-hidden rounded-lg bg-muted">
           <img
-            src={product.image}
+            src={product.image_url}
             alt={product.name}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />

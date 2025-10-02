@@ -1,15 +1,50 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { products } from '@/data/products';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/CartContext';
 import { ArrowLeft, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const product = products.find(p => p.id === id);
+
+  const { data: product, isLoading } = useQuery({
+    queryKey: ['product', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!id,
+  });
+
+  if (isLoading) {
+    return (
+      <main className="flex-1 py-12">
+        <div className="container">
+          <Skeleton className="h-10 w-24 mb-8" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <Skeleton className="aspect-square rounded-lg" />
+            <div className="space-y-6">
+              <Skeleton className="h-12 w-3/4" />
+              <Skeleton className="h-8 w-1/4" />
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-12 w-48" />
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   if (!product) {
     return (
@@ -41,13 +76,13 @@ const ProductDetail = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Product Image */}
-          <div className="aspect-square rounded-lg overflow-hidden bg-muted">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
-          </div>
+            <div className="aspect-square rounded-lg overflow-hidden bg-muted">
+              <img
+                src={product.image_url}
+                alt={product.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
 
           {/* Product Info */}
           <div className="space-y-6">
@@ -74,13 +109,13 @@ const ProductDetail = () => {
                 onClick={handleAddToCart}
                 size="lg"
                 className="w-full md:w-auto"
-                disabled={!product.inStock}
+                disabled={!product.in_stock}
               >
                 <ShoppingCart className="mr-2 h-5 w-5" />
-                {product.inStock ? 'Add to Cart' : 'Out of Stock'}
+                {product.in_stock ? 'Add to Cart' : 'Out of Stock'}
               </Button>
 
-              {product.inStock && (
+              {product.in_stock && (
                 <p className="text-sm text-muted-foreground">
                   ✓ In stock and ready to ship
                 </p>
